@@ -33,8 +33,11 @@ const Auth = () => {
                 navigate("/")
             }
         } catch (error) {
-            toast.error("Authentication Failed ")
-            console.log(error);
+            console.log("Full Error:", error);
+            console.log("Status:", error.response?.status);
+            console.log("Data:", error.response?.data);
+
+            toast.error(error.response?.data?.message || error.message);
         }
     }
 
