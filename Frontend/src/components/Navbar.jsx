@@ -71,8 +71,7 @@ const Navbar = () => {
             className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-lg"
         >
             <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-3 sm:px-5 lg:px-10">
-
-                {/* Logo */}
+ 
                 <div
                     onClick={() => {
                         navigate("/")
@@ -100,8 +99,7 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-5">
-
-                    {/* Credits dropdown */}
+ 
                     <div className="relative" ref={creditsRef}>
                         <motion.button
                             whileHover={{ scale: 1.04 }}
@@ -153,8 +151,7 @@ const Navbar = () => {
                             )}
                         </AnimatePresence>
                     </div>
-
-                    {/* Profile dropdown */}
+ 
                     <div className="relative" ref={profileRef}>
                         <motion.button
                             whileHover={{ scale: 1.08 }}
