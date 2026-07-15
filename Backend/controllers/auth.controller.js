@@ -16,19 +16,28 @@ export const GoogleAuth = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" })
 
-        res.cookie("token", token)
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 3 * 24 * 60 * 60 * 1000,
+        });
 
         return res.status(200).json({ message: `Welcome ${user.name}`, success: true, token, user })
     } catch (error) {
         console.log(error);
-        
+
         return res.status(500).json({ message: "Internal Server Error", success: false })
     }
 }
 
-export const Logout = async (req ,res)=>{
+export const Logout = async (req, res) => {
     try {
-        res.clearCookie("token")
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         return res.status(200).json({ message: "Logout Successfully", success: true })
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", success: false })
