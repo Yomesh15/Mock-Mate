@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setuserData } from "../redux/userSlice";
 
-
 const Navbar = () => {
     const { userData } = useSelector((state) => state.user);
     const dispatch = useDispatch();
@@ -30,7 +29,6 @@ const Navbar = () => {
         setShowCredits(false);
     };
 
-
     const navigationtoauth = () => {
         if (!userData) {
             navigate('/auth')
@@ -42,47 +40,28 @@ const Navbar = () => {
             const res = await axios.post(
                 `${import.meta.env.VITE_BACKEND}/auth/logout`,
                 {},
-                {
-                    withCredentials: true,
-                }
+                { withCredentials: true }
             );
-
             console.log(res.data.message);
-
             dispatch(setuserData(null))
-
             navigate("/auth");
         } catch (error) {
             console.log(error);
         }
     };
 
-
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (
-                creditsRef.current &&
-                !creditsRef.current.contains(e.target)
-            ) {
+            if (creditsRef.current && !creditsRef.current.contains(e.target)) {
                 setShowCredits(false);
             }
-
-            if (
-                profileRef.current &&
-                !profileRef.current.contains(e.target)
-            ) {
+            if (profileRef.current && !profileRef.current.contains(e.target)) {
                 setShowProfile(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
 
     return (
         <motion.nav
@@ -91,36 +70,38 @@ const Navbar = () => {
             transition={{ duration: 0.5 }}
             className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-lg"
         >
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-10">
+            <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-3 sm:px-5 lg:px-10">
 
+                {/* Logo */}
                 <div
                     onClick={() => {
                         navigate("/")
                         window.scrollTo({ top: 0, behavior: 'smooth' })
                     }}
-                    className="flex cursor-pointer items-center gap-4"
+                    className="flex cursor-pointer items-center gap-2 sm:gap-4 min-w-0"
                 >
                     <motion.div
                         whileHover={{ scale: 1.08, rotate: 8 }}
                         whileTap={{ scale: 0.95 }}
-                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-300"
+                        className="flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-300"
                     >
-                        <FaRobot size={22} />
+                        <FaRobot size={16} className="sm:hidden" />
+                        <FaRobot size={22} className="hidden sm:block" />
                     </motion.div>
 
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-900">
+                    <div className="min-w-0">
+                        <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">
                             Mock Mate
                         </h1>
-
-                        <p className="text-xs text-gray-500">
+                        <p className="hidden sm:block text-xs text-gray-500">
                             AI Interview Platform
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-2 sm:gap-5">
 
+                    {/* Credits dropdown */}
                     <div className="relative" ref={creditsRef}>
                         <motion.button
                             whileHover={{ scale: 1.04 }}
@@ -129,53 +110,34 @@ const Navbar = () => {
                                 toggleCredits()
                                 navigationtoauth()
                             }}
-                            className="flex cursor-pointer items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-5 py-2.5 transition-all hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-200"
+                            className="flex cursor-pointer items-center gap-1.5 sm:gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base transition-all hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-200"
                         >
-                            <TbCoinBitcoin className="text-xl" />
-
+                            <TbCoinBitcoin className="text-lg sm:text-xl" />
                             <span className="font-semibold">
                                 {userData?.credits || 0}
                             </span>
-
                             <ChevronDown
-                                size={17}
-                                className={`transition-transform duration-300 mt-0.5 ${showCredits ? "rotate-180" : ""
-                                    }`}
+                                size={16}
+                                className={`transition-transform duration-300 mt-0.5 ${showCredits ? "rotate-180" : ""}`}
                             />
                         </motion.button>
 
                         <AnimatePresence>
                             {showCredits && (
                                 <motion.div
-                                    initial={{
-                                        opacity: 0,
-                                        y: -15,
-                                        scale: 0.95,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                        scale: 1,
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        y: -15,
-                                        scale: 0.95,
-                                    }}
-                                    transition={{
-                                        duration: 0.22,
-                                    }}
-                                    className="absolute right-0 mt-4 w-72 rounded-2xl border bg-white p-5 shadow-2xl"
+                                    initial={{ opacity: 0, y: -15, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                                    transition={{ duration: 0.22 }}
+                                    className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-16 sm:top-auto sm:mt-4 w-[90vw] max-w-xs sm:w-72 rounded-2xl border bg-white p-5 shadow-2xl"
                                 >
                                     <h3 className="text-lg font-semibold">
                                         Need More Credits?
                                     </h3>
-
                                     <p className="mt-2 text-sm text-gray-500">
                                         Purchase interview credits and continue
                                         practicing without interruption.
                                     </p>
-
                                     <motion.button
                                         onClick={() => {
                                             navigate("/buycredit")
@@ -192,16 +154,13 @@ const Navbar = () => {
                         </AnimatePresence>
                     </div>
 
+                    {/* Profile dropdown */}
                     <div className="relative" ref={profileRef}>
                         <motion.button
-                            whileHover={{
-                                scale: 1.08
-                            }}
-                            whileTap={{
-                                scale: 0.96,
-                            }}
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.96 }}
                             onClick={toggleProfile}
-                            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg"
+                            className="flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg text-sm sm:text-base"
                         >
                             {userData?.name ? (
                                 userData.name.charAt(0).toUpperCase()
@@ -213,31 +172,16 @@ const Navbar = () => {
                         <AnimatePresence>
                             {showProfile && (
                                 <motion.div
-                                    initial={{
-                                        opacity: 0,
-                                        y: -15,
-                                        scale: 0.95,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                        scale: 1,
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        y: -15,
-                                        scale: 0.95,
-                                    }}
-                                    transition={{
-                                        duration: 0.22,
-                                    }}
-                                    className="absolute right-0 mt-4 w-72 rounded-2xl border bg-white p-5 shadow-2xl"
+                                    initial={{ opacity: 0, y: -15, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                                    transition={{ duration: 0.22 }}
+                                    className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 top-16 sm:top-auto sm:mt-4 w-[90vw] max-w-xs sm:w-72 rounded-2xl border bg-white p-5 shadow-2xl"
                                 >
                                     <div className="mb-4">
                                         <h2 className="text-lg font-semibold">
                                             {userData?.name || "Guest"}
                                         </h2>
-
                                         <p className="text-sm text-gray-500">
                                             {userData?.email}
                                         </p>
@@ -252,14 +196,12 @@ const Navbar = () => {
                                         >
                                             Dashboard
                                         </motion.button>
-
                                         <motion.button
                                             whileHover={{ x: 5 }}
                                             className="cursor-pointer rounded-xl p-3 text-left transition hover:bg-gray-100"
                                         >
                                             Interview History
                                         </motion.button>
-
                                         <motion.button
                                             whileHover={{ x: 5 }}
                                             className="cursor-pointer rounded-xl p-3 text-left transition hover:bg-gray-100"
@@ -272,7 +214,7 @@ const Navbar = () => {
                                                 whileHover={{ scale: 1.02, x: 5 }}
                                                 whileTap={{ scale: 0.98 }}
                                                 onClick={handleLogout}
-                                                className="cursor-pointer rounded-xl p-3 text-left font-medium text-red-600  hover:bg-gray-100 transition"
+                                                className="cursor-pointer rounded-xl p-3 text-left font-medium text-red-600 hover:bg-gray-100 transition"
                                             >
                                                 Logout
                                             </motion.button>
@@ -280,10 +222,8 @@ const Navbar = () => {
                                             <motion.button
                                                 whileHover={{ scale: 1.02, x: 5 }}
                                                 whileTap={{ scale: 0.98 }}
-                                                onClick={() =>
-                                                    navigate("/auth")
-                                                }
-                                                className="cursor-pointer rounded-xl p-3 text-left font-medium  hover:bg-gray-100 text-violet-500 transition"
+                                                onClick={() => navigate("/auth")}
+                                                className="cursor-pointer rounded-xl p-3 text-left font-medium hover:bg-gray-100 text-violet-500 transition"
                                             >
                                                 Login
                                             </motion.button>
@@ -292,7 +232,6 @@ const Navbar = () => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
-
                     </div>
                 </div>
             </div>
