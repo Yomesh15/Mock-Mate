@@ -3,7 +3,7 @@ import { PDFParse } from "pdf-parse";
 import { askAI } from "../services/openRouter.service.js";
 import InterviewModel from "../models/interview.model.js";
 
-// ai analyze the interview ans return somethings by reading resumee 
+// anlyze resume
 export const analyzeResume = async (req, res) => {
   try {
     if (!req.file) {
@@ -13,26 +13,19 @@ export const analyzeResume = async (req, res) => {
       });
     }
 
-    const filepath = req.file.path;
+    const fileBuffer = req.file.buffer;
 
-    const fileBuffer = await fs.promises.readFile(filepath);
-
-    // Create parser
     const parser = new PDFParse({
       data: fileBuffer,
     });
 
-    // Extract text
     const result = await parser.getText();
 
-    // Cleanup parser
     await parser.destroy();
 
-    let resumetext = result.text.replace(/\s+/g, " ").trim();
+    const resumetext = result.text.replace(/\s+/g, " ").trim();
 
     if (!resumetext) {
-      fs.unlinkSync(filepath);
-
       return res.status(400).json({
         success: false,
         message: "No text found in PDF",
@@ -63,28 +56,31 @@ Return ONLY valid JSON.
 
     const airesponse = await askAI({ messages });
 
-    const parsed = JSON.parse(airesponse);
+    let parsed;
 
-    fs.unlinkSync(filepath);
+    try {
+      parsed = JSON.parse(airesponse);
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: "AI returned invalid JSON.",
+      });
+    }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
-      role: parsed.role,
-      experience: parsed.experience,
-      projects: parsed.projects,
-      skills: parsed.skills,
+      role: parsed.role || "",
+      experience: parsed.experience || "",
+      projects: parsed.projects || [],
+      skills: parsed.skills || [],
       resumetext,
     });
   } catch (error) {
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-
-    console.error(error);
+    console.error("Resume Analysis Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Internal Server Error",
     });
   }
 };
@@ -473,13 +469,13 @@ export const getInterviewReport = async (req, res) => {
       ? totalCorrectness / totalQuestions
       : 0;
 
-      return res.json({
-        finalScore : interview.finalScore,
-        confidence :  Number(avgConfidence.toFixed(1)),
-        communication :  Number(avgCommunication.toFixed(1)),
-        correctness :  Number(avgCorrectness.toFixed(1)),
-        questionWiseScore: interview.questions
-      })
+    return res.json({
+      finalScore: interview.finalScore,
+      confidence: Number(avgConfidence.toFixed(1)),
+      communication: Number(avgCommunication.toFixed(1)),
+      correctness: Number(avgCorrectness.toFixed(1)),
+      questionWiseScore: interview.questions
+    })
 
   } catch (error) {
     console.log(error);
